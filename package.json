@@ -1,0 +1,33 @@
+{
+    "name": "bottomless-js",
+    "version": "1.0.0",
+    "description": "A lightweight JavaScript library for infinite vertical scrolling",
+    "main": "dist/bottomless.min.js",
+    "scripts": {
+      "build": "terser src/bottomless.js -c -m -o dist/bottomless.min.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+      "infinite-scroll",
+      "scroll",
+      "bottomless",
+      "loop",
+      "vertical-scrolling",
+      "javascript",
+      "vanillajs",
+      "frontend"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/username/bottomless.git"
+    },
+    "bugs": {
+      "url": "https://github.com/username/bottomless/issues"
+    },
+    "homepage": "https://github.com/username/bottomless#readme",
+    "devDependencies": {
+      "terser": "^5.17.1"
+    }
+  }

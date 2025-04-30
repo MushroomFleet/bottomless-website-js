@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bottomless.js - Infinite Vertical Scrolling Library</title>
+    <style>
+        /* Global Variables */
+        :root {
+            --primary-color: #6366F1;
+            --primary-dark: #4338CA;
+            --secondary-color: #22D3EE;
+            --text-light: #F9FAFB;
+            --text-dark: #1F2937;
+            --bg-light: #FFFFFF;
+            --bg-dark: #111827;
+            --card-light: #F3F4F6;
+            --card-dark: #1E293B;
+        }
+        
+        /* Base Styles */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Page Content - Will be Looped */
+        .page-content {
+            min-height: 100vh;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 1;
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #6366F1, #22D3EE);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .button-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .button-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .button-outline {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .button-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        body.dark-mode .button-outline {
+            border-color: var(--text-light);
+            color: var(--text-light);
+        }
+        
+        body.dark-mode .button-outline:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Features Section */
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .feature-card {
+            background-color: var(--card-light);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        body.dark-mode .feature-card {
+            background-color: var(--card-dark);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        
+        /* Code Section */
+        .code-section {
+            margin: 4rem 0;
+        }
+        
+        .code-block {
+            background-color: var(--card-dark);
+            color: var(--text-light);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .comment {
+            color: #A1A1AA;
+        }
+        
+        .keyword {
+            color: #FF79C6;
+        }
+        
+        .string {
+            color: #F1FA8C;
+        }
+        
+        .function {
+            color: #50FA7B;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+        
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+        
+        /* Fixed UI Elements - Outside Loop */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366F1, #22D3EE);
+            z-index: 1001;
+            width: 0%;
+            transition: width 0.2s;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .discovery-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(99, 102, 241, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        
+        .discovery-hint.visible {
+            opacity: 1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+            }
+            
+            nav a {
+                margin: 0 0.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed elements outside the looping content -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+    <div class="discovery-hint" id="discovery-hint">Keep scrolling to see more!</div>
+    <button class="theme-toggle" id="theme-toggle">
+        <span class="light-icon">🌙</span>
+        <span class="dark-icon" style="display: none;">☀️</span>
+    </button>
+    
+    <!-- Content that will be looped -->
+    <div class="page-content">
+        <header>
+            <div class="container header-container">
+                <a href="#" class="logo">Bottomless.js</a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#installation">Installation</a>
+                    <a href="#examples">Examples</a>
+                    <a href="https://github.com/username/bottomless">GitHub</a>
+                </nav>
+            </div>
+        </header>
+        
+        <section class="hero">
+            <div class="container">
+                <h1>Bottomless.js</h1>
+                <p>
+                    A lightweight JavaScript library for creating infinite vertical scrolling experiences.
+                    Scroll seamlessly in either direction with content that loops indefinitely.
+                </p>
+                <div class="cta-buttons">
+                    <a href="#installation" class="button button-primary">Get Started</a>
+                    <a href="https://github.com/username/bottomless" class="button button-outline">View on GitHub</a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Features</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🔄 Infinite Scrolling</h3>
+                        <p>
+                            Create seamless vertical scrolling experiences in both directions.
+                            Content loops infinitely without visible breaks or jumps.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🧩 Zero Dependencies</h3>
+                        <p>
+                            Built with pure vanilla JavaScript (~5kb minified).
+                            No external libraries or frameworks required.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>📱 Fully Responsive</h3>
+                        <p>
+                            Works perfectly on all device sizes from mobile phones
+                            to large desktop displays.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🌓 Theme Compatible</h3>
+                        <p>
+                            Seamlessly integrates with light/dark themes and 
+                            other dynamic styling approaches.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🔌 Simple API</h3>
+                        <p>
+                            Easy to implement with minimal configuration.
+                            Offers customization options for advanced use cases.
+                        </p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>🚀 Performance Optimized</h3>
+                        <p>
+                            Efficiently manages DOM elements to ensure smooth scrolling
+                            even during extended browsing sessions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="installation">
+            <div class="container">
+                <h2 class="section-title">Installation</h2>
+                
+                <h3>Direct Download</h3>
+                <p>Download the latest version and include it in your project:</p>
+                <div class="code-block">
+                    <pre><span class="comment">&lt;!-- Add to your HTML file --&gt;</span>
+<span class="keyword">&lt;script</span> <span class="function">src</span>=<span class="string">"path/to/bottomless.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span></pre>
+                </div>
+                
+                <h3>CDN</h3>
+                <p>Include directly from a CDN:</p>
+                <div class="code-block">
+                    <pre><span class="comment">&lt;!-- Latest version --&gt;</span>
+<span class="keyword">&lt;script</span> <span class="function">src</span>=<span class="string">"https://cdn.jsdelivr.net/gh/username/bottomless@latest/dist/bottomless.min.js"</span><span class="keyword">&gt;&lt;/script&gt;</span></pre>
+                </div>
+                
+                <h3>npm</h3>
+                <p>Install via npm and import into your project:</p>
+                <div class="code-block">
+                    <pre><span class="comment"># Install package</span>
+npm install bottomless-js
+
+<span class="comment">// Import in your JavaScript</span>
+<span class="keyword">import</span> Bottomless <span class="keyword">from</span> <span class="string">'bottomless-js'</span>;</pre>
+                </div>
+                
+                <h3>Basic Usage</h3>
+                <p>Initialize with your content container:</p>
+                <div class="code-block">
+                    <pre><span class="keyword">const</span> bottomless = <span class="keyword">new</span> <span class="function">Bottomless</span>({
+    contentSelector: <span class="string">'.page-content'</span>,
+    showPageIndicator: <span class="keyword">true</span>,
+    onPageChange: <span class="keyword">function</span>(pageNum) {
+        console.<span class="function">log</span>(<span class="string">'Now viewing page:'</span>, pageNum);
+    }
+});</pre>
+                </div>
+            </div>
+        </section>
+        
+        <section id="examples">
+            <div class="container">
+                <h2 class="section-title">Examples</h2>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>Content Discovery</h3>
+                        <p>
+                            Perfect for creating infinite content feeds where users can continuously discover
+                            new items without hitting pagination barriers.
+                        </p>
+                        <a href="examples/basic.html" style="color: var(--primary-color);">View Example →</a>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>With Progress Indicator</h3>
+                        <p>
+                            Add a visual progress bar to show users their position within the current 
+                            content loop. Great for providing context during navigation.
+                        </p>
+                        <a href="examples/advanced.html" style="color: var(--primary-color);">View Example →</a>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>Theme Toggle Integration</h3>
+                        <p>
+                            See how to integrate dark/light theme functionality with
+                            the bottomless scrolling effect.
+                        </p>
+                        <a href="examples/advanced.html" style="color: var(--primary-color);">View Example →</a>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="https://github.com/username/bottomless/tree/main/examples" class="button button-primary">Browse All Examples</a>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="container">
+                <p>Currently experiencing the Bottomless.js infinite scroll effect. Keep scrolling!</p>
+                <p>
+                    <a href="https://github.com/username/bottomless">GitHub</a> |
+                    <a href="https://github.com/username/bottomless/blob/main/LICENSE">License</a> |
+                    <a href="https://github.com/username/bottomless/issues">Issues</a>
+                </p>
+                <p>&copy; <span id="current-year">2025</span> Bottomless.js</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Include the Bottomless.js library -->
+    <script src="../dist/bottomless.min.js"></script>
+    
+    <!-- Initialize functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Theme toggle functionality
+            const toggleButton = document.getElementById('theme-toggle');
+            const lightIcon = toggleButton.querySelector('.light-icon');
+            const darkIcon = toggleButton.querySelector('.dark-icon');
+            
+            // Check for saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'inline';
+            }
+            
+            // Toggle theme
+            toggleButton.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                
+                if (isDarkMode) {
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'inline';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    lightIcon.style.display = 'inline';
+                    darkIcon.style.display = 'none';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            
+            // Initialize Bottomless.js
+            const bottomless = new Bottomless({
+                contentSelector: '.page-content',
+                showPageIndicator: false,
+                onPageChange: function(pageNum) {
+                    // Show discovery hint every other page
+                    if (pageNum % 2 === 0) {
+                        const hint = document.getElementById('discovery-hint');
+                        hint.textContent = `You've discovered page ${pageNum}!`;
+                        hint.classList.add('visible');
+                        
+                        setTimeout(function() {
+                            hint.classList.remove('visible');
+                        }, 3000);
+                    }
+                }
+            });
+            
+            // Update scroll progress bar
+            window.addEventListener('scroll', function() {
+                const pageHeight = document.querySelector('.page-content').offsetHeight;
+                const scrollPosition = window.scrollY % pageHeight;
+                const progress = (scrollPosition / pageHeight) * 100;
+                
+                document.getElementById('scroll-progress').style.width = progress + '%';
+            });
+        });
+    </script>
+</body>
+</html>
